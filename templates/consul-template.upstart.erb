@@ -8,12 +8,11 @@ env CONFIG=<%= scope.lookupvar('consul_template::config_dir') %>
 
 
 script
-	[ -r /etc/default/consul-template ] && . /etc/default/consul-template
-    exec $CONSUL -config $CONFIG/config <%= scope.lookupvar('consul_template::extra_options') %>
+	sudo -u <%= scope.lookupvar('consul_template::user') %> -g <%= scope.lookupvar('consul_template::group') %> -- /bin/bash -c '
+		[ -r /etc/default/consul-template ] && . /etc/default/consul-template
+		exec $CONSUL -config $CONFIG/config <%= scope.lookupvar('consul_template::extra_options') %>
+	'
 end script
-
-setuid <%= scope.lookupvar('consul_template::user') %>
-setgid <%= scope.lookupvar('consul_template::group') %>
 
 respawn
 respawn limit 10 10
